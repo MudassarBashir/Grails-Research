@@ -5,6 +5,9 @@ class OwnerB {
 
     static hasMany = [ owned : Owned ]
 
-    static constraints = {
+
+
+    static mapping = {
+        owned cascade: "all-delete-orphan"
     }
 }

@@ -45,6 +45,10 @@ class MainController {
     }
 
     def caseOfMultipleOwners () {
+        Owned.list().each {it.delete()}
+        OwnerA.list().each {it.delete()}
+        OwnerB.list().each {it.delete()}
+
         // creating a few instances of the owned domain class
         def owneda = new Owned(name: 'Owned A')
         def ownedb = new Owned(name: 'Owned B')
@@ -66,19 +70,9 @@ class MainController {
         ownerB.addToOwned(ownedb)
         ownerB.addToOwned(ownedc)
 
-        // We also need to let the owned objects know who their owners are because this property cannot be null. But their
-        // ownerb can be null since I set it to nullable true.
-        owneda.ownera = ownerA
-        ownedb.ownera = ownerA
-        ownedc.ownera = ownerA
-
-        owneda.ownerb = ownerB
-        ownedb.ownerb = ownerB
-        ownedc.ownerb = ownerB
-
         // now we save the owner instances
-        ownerA.save(failOnError: true)
-        ownerB.save(failOnError: true)
+        ownerA.save()
+        ownerB.save()
 
         // now we see how many instances of both Owners and Owned are in our db
         println "Trial 1"
@@ -86,8 +80,20 @@ class MainController {
         println "The number of Owner Bs in existence are: " + OwnerB.count()
         println "The number of Owned in existence are: " + Owned.count()
 
-        // Now we delete the Owner A instance
-        ownerA.delete(failOnError: true, flush: true)
+        /* These remove methods become necessary when the relationship is bidirectional
+        which I believe is necessary to clear back references. If the relationship is unidirectional,
+        we can replaced the three removeFrom lines below simply with
+        ownerA.owned.clear()
+        This would clear ownerA's collection of owned instances at the same time delete them unless they
+        are owned by another object. In this example they are owned by another object which is ownerB hence
+        they aren't deleted, but after calling clear() we can proceed directly to the line below where ownerA
+        is deleted. */
+
+        ownerA.removeFromOwned(owneda) // These remove methods become necessary when the relationship is bidirectional
+        ownerA.removeFromOwned(ownedb) // which I believe is necessary to clear back references.
+        ownerA.removeFromOwned(ownedc)
+
+        ownerA.delete(flush: true)
 
         // now we see how many instances of both Owners and Owned are in our db after the deletion
         println "*****"

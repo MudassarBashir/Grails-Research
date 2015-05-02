@@ -80,17 +80,19 @@ class MainController {
         println "The number of Owner Bs in existence are: " + OwnerB.count()
         println "The number of Owned in existence are: " + Owned.count()
 
-        /* These remove methods become necessary when the relationship is bidirectional
+        /* These remove methods(below) become necessary when the relationship is bidirectional
         which I believe is necessary to clear back references. If the relationship is unidirectional,
-        we can replaced the three removeFrom lines below simply with
+        we can replace the three removeFrom lines below simply with
+
         ownerA.owned.clear()
-        This would clear ownerA's collection of owned instances at the same time delete them unless they
+
+        This would clear ownerA's collection of owned instances and at the same time delete them unless they
         are owned by another object. In this example they are owned by another object which is ownerB hence
         they aren't deleted, but after calling clear() we can proceed directly to the line below where ownerA
         is deleted. */
 
-        ownerA.removeFromOwned(owneda) // These remove methods become necessary when the relationship is bidirectional
-        ownerA.removeFromOwned(ownedb) // which I believe is necessary to clear back references.
+        ownerA.removeFromOwned(owneda)
+        ownerA.removeFromOwned(ownedb)
         ownerA.removeFromOwned(ownedc)
 
         ownerA.delete(flush: true)
